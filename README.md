@@ -1,1 +1,1 @@
-# Bayesian-Classifers-for-PU_learning
+# Bayesian Classifers for PU-learning
