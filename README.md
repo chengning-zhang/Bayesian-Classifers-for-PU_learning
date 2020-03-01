@@ -42,7 +42,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Authors
 
-* **Chengning Zhang** - *Initial work* - [PurpleBooth](https://github.com/)
+* **Chengning Zhang** - *Initial work* - [Bayesian Classifers for PU-learning](https://github.com/chengning-zhang/Bayesian-Classifers-for-PU_learning)
 
 ## License
 
