@@ -1,7 +1,7 @@
 # Bayesian Classifers for PU-learning
 
 
-This module contains a custom implementation of Bayesian network for PU_learning, written from scratch in Python 3, API inspired by SciKit-learn. 
+This module contains a custom implementation of Bayesian network for **PU learning**, written from scratch in Python 3, API inspired by SciKit-learn. 
 This module implements multiple Bayesian classifiers: 
 * [Positive Naive Bayes(PNB)](https://doi.org/10.1016/j.patrec.2007.08.003 "PNB")
 * [Positive Tree-Augmented Naive Bayes(PTAN)](https://doi.org/10.1016/j.patrec.2007.08.003 "PTAN")
