@@ -5,8 +5,8 @@ This module contains a custom implementation of Bayesian network for PU_learning
 This module implements multiple Bayesian classifiers: 
 * [Positive Naive Bayes(PNB)](https://doi.org/10.1016/j.patrec.2007.08.003 "PNB")
 * [Positive Tree-Augmented Naive Bayes(PTAN)](https://doi.org/10.1016/j.patrec.2007.08.003 "PTAN")
-* Positive Simpler TAN(PSTAN)
-* Positive Ensemble TAN(PETAN)
+* [Positive Simpler TAN(PSTAN)](https://github.com/chengning-zhang/Bayesian-Classifers-for-PU_learning "PSTAN")
+* [Positive Ensemble TAN(PETAN)](https://github.com/chengning-zhang/Bayesian-Classifers-for-PU_learning "PETAN")
 
 **PU learning** is the setting where a learner only has access to positive examples and unlabeled data. The assumption is that the unlabeled data can contain both positive and negative examples 
 
