@@ -1,20 +1,20 @@
-from google.colab import drive
-drive.mount('/content/drive')
-#!pip install shap
-#!pip install pyitlib
-import os
-os.path.abspath(os.getcwd())
-os.chdir('/content/drive/My Drive/Protein project')
-os.path.abspath(os.getcwd())
+# from google.colab import drive
+# drive.mount('/content/drive')
+# !pip install shap
+# !pip install pyitlib
+# import os
+# os.path.abspath(os.getcwd())
+# os.chdir('/content/drive/My Drive/Protein project')
+# os.path.abspath(os.getcwd())
 
 import warnings
 warnings.filterwarnings("ignore")
-from __future__ import division ###for float operation
+from __future__ import division  # for float operation
 from collections import Counter
 import numpy as np
 from sklearn.metrics import accuracy_score
-from sklearn.metrics import recall_score ##tp / (tp + fn)
-from sklearn.metrics import precision_score #tp / (tp + fp)
+from sklearn.metrics import recall_score  # tp / (tp + fn)
+from sklearn.metrics import precision_score # tp / (tp + fp)
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.model_selection import KFold, StratifiedKFold
 #from pyitlib import discrete_random_variable as drv
@@ -27,13 +27,13 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted ### Checks if the estimator is fitted by verifying the presence of fitted attributes (ending with a trailing underscore)
 #from sklearn.utils.multiclass import unique_labels, not necessary, can be replaced by array(list(set()))
 
-"""
-Bayesian network implementation for Postitive Unlabeled examples
-API inspired by SciKit-learn.
-"""
+
 
 class Bayes_net_PU(BaseEstimator, ClassifierMixin): 
-
+    """
+    Bayesian network implementation for Postitive Unlabeled examples
+    API inspired by SciKit-learn.
+    """
     def predict_proba(self, X): ### key prediction methods, all other prediction methods will use it first.
       raise NotImplementedError
 
