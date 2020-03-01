@@ -2,11 +2,17 @@
 # drive.mount('/content/drive')
 # !pip install shap
 # !pip install pyitlib
-import os
+# import os
 # os.path.abspath(os.getcwd())
 # os.chdir('/content/drive/My Drive/Protein project')
 # os.path.abspath(os.getcwd())
 
+#!/usr/bin/env python
+#-*- coding:utf-8 -*-
+"""
+Created on Mar 1, 2020
+@author: Chengning Zhang
+"""
 import warnings
 warnings.filterwarnings("ignore")
 from __future__ import division ###for float operation
