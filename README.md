@@ -27,8 +27,44 @@ p450_pu.X_1abeled_  # labeled set
 p450_pu.X_Unlabeled_ # Unlabeled set
 p450_pu.y_Unlabeled_ # Unlabeled target values(unknown in practice)
 ```
-![](images/)
+![](images/Unlabeled_dist_plot.png)
+![](images/population_dist_plot.png)
 
+
+### PU Bayesian classifiers
+Demo for implementation of PNB and PSTAN, from training to prediction
+
+```javascript
+import PNB
+pnb = PNB()
+pnb.fit(p450_pu.X_1abeled_,p450_pu.X_Unlabeled_, p450_pu.prevalence_) # model fitting
+pnb.predict(p450_pu.X_Unlabeled_) # prediction
+pnb.predict_proba(p450_pu.X_Unlabeled_) # proba prediction
+
+```
+
+```javascript
+import PSTAN
+pstan = PSTAN()
+pstan.fit(p450_pu.X_1abeled_,p450_pu.X_Unlabeled_, p450_pu.prevalence_,M) # model fitting
+pstan.plot_tree_structure() # plot learned tree-structure
+pstan.predict(p450_pu.X_Unlabeled_) # prediction
+pstan.predict_proba(p450_pu.X_Unlabeled_) # proba prediction
+```
+![](images/tree_plot_p450_stan.png)
+
+### Evaluation
+Evaluation under multiple runs, take average.
+
+```javascript
+import get_cv
+
+Accuracy, CLL, Precision,Recall = get_cv(PNB,X,y,400,800,M)
+print(np.mean(Accuracy))
+print(np.mean(CLL))
+print(np.mean(Precision))
+print(np.mean(Recall))
+```
 
 
 
