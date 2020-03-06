@@ -32,7 +32,7 @@ import pandas as pd
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted ### Checks if the estimator is fitted by verifying the presence of fitted attributes (ending with a trailing underscore)
 #from sklearn.utils.multiclass import unique_labels, not necessary, can be replaced by array(list(set()))
-
+#
 
 class PUgenerator:
   """ Generate PU data from fully labeled data set.
