@@ -546,7 +546,7 @@ class PESTAN(Bayes_net_PU):
   def __init__(self,alpha = 1):
     self.alpha = alpha
 
-  def fit(self,X_L, X_u, pri, M): 
+  def fit(self,X_L, X_u, pri, M, case_control = True): 
     X_L = check_array(X_L)
     X_u = check_array(X_u)
     if X_L.shape[1] != X_u.shape[1]:
@@ -557,9 +557,10 @@ class PESTAN(Bayes_net_PU):
     ## train p PSTAN base models
     for i in range(p):
       model = PSTAN(self.alpha, starting_node= i)
-      model.fit(X_L, X_u, pri, M)
+      model.fit(X_L, X_u, pri, M, case_control)
       models.append(model)
-  
+    
+    self.case_control_ = case_control
     self.models_, self.n_features_ = models, p
     self.is_fitted_ = True
     return self
@@ -576,6 +577,8 @@ class PESTAN(Bayes_net_PU):
     return(Prob_1)
 
   
+
+  
   
 
 class PETAN(Bayes_net_PU):
@@ -583,7 +586,7 @@ class PETAN(Bayes_net_PU):
   def __init__(self,alpha = 1):
     self.alpha = alpha
 
-  def fit(self,X_L, X_u, pri, M): 
+  def fit(self,X_L, X_u, pri, M, case_control = True): 
     X_L = check_array(X_L)
     X_u = check_array(X_u)
     if X_L.shape[1] != X_u.shape[1]:
@@ -594,12 +597,12 @@ class PETAN(Bayes_net_PU):
     ## train p PTAN base models
     for i in range(p):
       model = PTAN(self.alpha, starting_node= i)
-      model.fit(X_L, X_u, pri)
+      model.fit(X_L, X_u, pri,case_control)
       models.append(model)
     
     #append STAN
     model = PSTAN(self.alpha, starting_node = 0) #
-    model.fit(X_L, X_u, pri, M)
+    model.fit(X_L, X_u, pri, M,case_control)
     models.append(model)    
     self.models_, self.n_features_ = models, p
     self.is_fitted_ = True
@@ -616,4 +619,5 @@ class PETAN(Bayes_net_PU):
     Prob_1 = Prob_1/(self.n_features_+ 1)
     return(Prob_1)
 
+  
   
