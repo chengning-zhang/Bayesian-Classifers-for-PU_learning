@@ -34,11 +34,11 @@ from sklearn.utils.validation import check_X_y, check_array, check_is_fitted ###
 #from sklearn.utils.multiclass import unique_labels, not necessary, can be replaced by array(list(set()))
 
 
-def get_cv(cls,X,y,nl,nu,M = None,runs=10,verbose = True,random_state = 42,pos_label = '1'):  
+def get_cv(X, y, case_control = True, nl = None, nu = None, c = None,n_T = None, random_state = 42, pos_label = '1', cls = None, M = None, runs=10, verbose = True):  
   """ Get CLL, accuracy, precision, recall under multiple runs
       Parameters
       ----------
-      cls:  ___{PNB, PTAN,PSTAN}___
+      cls:  ___{PNB, PTAN,PSTAN, WNB, WTAN}___
             Model class
       X : {array-like, sparse matrix}, shape (n_samples, n_features)
             Feature matrix.
@@ -56,6 +56,8 @@ def get_cv(cls,X,y,nl,nu,M = None,runs=10,verbose = True,random_state = 42,pos_l
             Random state on PU generator, make results reproducible
       Pos_label : str type
             Positive label in data. Default is '1'
+      case_control : bool
+
       Returns
       -------
       CLL, accuracy, precision, recall of all runs.
@@ -67,11 +69,11 @@ def get_cv(cls,X,y,nl,nu,M = None,runs=10,verbose = True,random_state = 42,pos_l
   Recall = []
   CLL = []
   for i in range(runs):
-    # generate PU data
+    # generate PU data, with different seed i*random_state
     pu_object = PUgenerator()
-    pu_object.fit(X,y,nl,nu,random_state*(i+1),pos_label)  
+    pu_object.fit(X,y,case_control,nl,nu,c,n_T,random_state*(i+1),pos_label) # generate case control or single training data
     model = cls()
-    model.fit(pu_object.X_1abeled_,pu_object.X_Unlabeled_, pu_object.prevalence_,M)
+    model.fit(pu_object.X_1abeled_,pu_object.X_Unlabeled_, pu_object.prevalence_,M, case_control)
     Accuracy.append(accuracy_score(pu_object.y_Unlabeled_,model.predict(pu_object.X_Unlabeled_)) )
     CLL.append(model.Conditional_log_likelihood(pu_object.y_Unlabeled_,model.predict_proba(pu_object.X_Unlabeled_)) )
     Precision.append(precision_score(pu_object.y_Unlabeled_,model.predict(pu_object.X_Unlabeled_), 
@@ -83,5 +85,7 @@ def get_cv(cls,X,y,nl,nu,M = None,runs=10,verbose = True,random_state = 42,pos_l
         print("CLL in %s -th run is %s" % (i+1,CLL[i]))
         print("Precision in %s -th run is %s" % (i+1,Precision[i]) )
         print("Recall in %s -th run is %s" % (i+1,Recall[i]) )
+        if not case_control:
+          print("estimated p(s=1|y=1) in %s -th run = %s" % (i+1, model.c_ ))
         print(10*'__')
   return np.array(Accuracy), np.array(CLL), np.array(Precision),np.array(Recall)
