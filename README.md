@@ -18,14 +18,14 @@ We consider **"case-control"** and **"single training"** sampling scenariors.
 ## Current features
 
 ### PU Generator
-Generate Positive and Unlabeled data from fully labeled data set. 
+Generate Positive and Unlabeled data from fully labeled data set, either follows "case-control" or "single training".
 
 ```javascript
 import PUgenerator
 
 p450_pu = PUgenerator()
-p450_pu.fit(X,y,400,800)
-p450_pu.prevalence_ # 0.653
+p450_pu.fit(X,y,nl = 400,nu = 800, case_control = True) # "case-control"
+p450_pu.prevalence_ # p(y=1)
 p450_pu.plot_dist() # plot all feature distributions
 
 p450_pu.X_1abeled_  # labeled set
