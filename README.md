@@ -7,6 +7,8 @@ This module implements multiple Bayesian classifiers:
 * [Positive Tree-Augmented Naive Bayes(PTAN)](https://doi.org/10.1016/j.patrec.2007.08.003 "PTAN")
 * [Positive Simpler TAN(PSTAN)](https://github.com/chengning-zhang/Bayesian-Classifers-for-PU_learning "PSTAN")
 * [Positive Ensemble TAN(PETAN)](https://github.com/chengning-zhang/Bayesian-Classifers-for-PU_learning "PETAN")
+* [Weighted Naive Bayes(WNB)](https://github.com/chengning-zhang/Bayesian-Classifers-for-PU_learning "WNB")
+* [Weighted Tree-Augmented Naive Bayes(WTAN)](https://github.com/chengning-zhang/Bayesian-Classifers-for-PU_learning "WTAN")
 
 **PU learning** is the setting where a learner only has access to positive examples and unlabeled data. The assumption is that the unlabeled data can contain both positive and negative examples 
 
