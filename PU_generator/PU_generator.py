@@ -42,7 +42,7 @@ class PUgenerator:
   def __init__(self):
       pass
 
-  def fit(self,X,y,n_L = None,n_U = None,random_state = 42,pos_label = '1',case_control = True, c = None,n_T = None):
+  def fit(self,X,y, case_control = True, n_L = None,n_U = None,  c = None,n_T = None, random_state = 42, pos_label = '1'):
     """ Implementation of a fitting function.
         Parameters
         ----------
@@ -147,4 +147,6 @@ class PUgenerator:
     X_1_true_count.apply(lambda x: 100 * x / x.sum() ).plot(kind='bar',subplots=True,layout=(int(self.p_/2), 2),title = "Positive population, f(x|y=1)",sharex = False)
     X_L_count.apply(lambda x: 100 * x / x.sum() ).plot(kind='bar',subplots=True,layout=(int(self.p_/2), 2),title = "Labeled, f(x|s=1)",sharex = False)
     
+
+
 
