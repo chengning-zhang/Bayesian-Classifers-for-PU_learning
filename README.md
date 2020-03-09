@@ -12,8 +12,8 @@ This module implements multiple Bayesian classifiers:
 
 **PU learning** is the setting where a learner only has access to positive examples and unlabeled data. The assumption is that the unlabeled data can contain both positive and negative examples.
 
-Note: All algorithms make the "Select Completely At Random(SCAR)" labeling assumption. 
-We consider "case-control" and "single training" sampling scenariors.  
+Note: All algorithms make the **"Select Completely At Random(SCAR)"** labeling assumption. 
+We consider **"case-control"** and **"single training"** sampling scenariors.  
 
 ## Current features
 
