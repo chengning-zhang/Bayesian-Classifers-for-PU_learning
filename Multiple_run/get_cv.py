@@ -32,7 +32,7 @@ import pandas as pd
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted ### Checks if the estimator is fitted by verifying the presence of fitted attributes (ending with a trailing underscore)
 #from sklearn.utils.multiclass import unique_labels, not necessary, can be replaced by array(list(set()))
-
+from sklearn import preprocessing
 
 def get_cv(X, y, case_control = True, nl = None, nu = None, c = None,n_T = None, random_state = 42, pos_label = '1', cls = None, M = None, runs=10, verbose = True):  
   """ Get CLL, accuracy, precision, recall under multiple runs
