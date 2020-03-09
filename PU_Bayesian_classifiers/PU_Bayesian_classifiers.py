@@ -32,7 +32,7 @@ import pandas as pd
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted ### Checks if the estimator is fitted by verifying the presence of fitted attributes (ending with a trailing underscore)
 #from sklearn.utils.multiclass import unique_labels, not necessary, can be replaced by array(list(set()))
-
+from sklearn import preprocessing
 
 
 class Bayes_net_PU(BaseEstimator, ClassifierMixin): 
@@ -41,7 +41,7 @@ class Bayes_net_PU(BaseEstimator, ClassifierMixin):
     API inspired by SciKit-learn.
     """
 
-    def predict_proba(self, X): ### key prediction methods, all other prediction methods will use it first.
+    def predict_proba(self, X): # key prediction methods, all other prediction methods will use it first.
       raise NotImplementedError
 
     def predict(self, X):
@@ -81,6 +81,7 @@ class Bayes_net_PU(BaseEstimator, ClassifierMixin):
       #mapping=dict(zip(range(8),['b0','b1','b2','b3','b4','b5','b6','b7']))
       plt.figure(figsize=figsize)
       nx.draw_networkx(G,nx.shell_layout(G))
+
 
 
 
@@ -189,16 +190,13 @@ class PNB(Bayes_net_PU):
     
 
     
-
-
-
 class PTAN(Bayes_net_PU):
     name = "PTAN"
     def __init__(self, alpha = 1,starting_node = 0):
       self.starting_node = starting_node
       self.alpha = alpha
     
-    def get_mutual_inf(self,X_L, X_u, pri, case_control, M = None):
+    def get_mutual_inf(self,X_L, X_u, pri, case_control):
       """get PU conditional mutual inf of all pairs of features, part of training
         Parameters
         ----------
@@ -209,11 +207,9 @@ class PTAN(Bayes_net_PU):
         pri : scalar.
             The prevalence probability (p(y = 1))
         case_control : Bool
-            Case control scenario or single-training data scenario
-        M : None
-            contact matrix    
+            Case control scenario or single-training data scenario  
         
-        Returns
+        Returns M
         -------
         np.array matrix.
       """
@@ -313,9 +309,9 @@ class PTAN(Bayes_net_PU):
       # return n_L,p,n_u,M,List_prob_xi_xj_1,List_count_xi_xj_1,List_prob_xi_xj_U,List_count_xi_xj_U,List_prob_xi_xj_0,K,pri 
       return n_L,p,n_U_or_UL,M,K,X_values
 
-    def Findparent(self,X_L, X_u, pri, case_control, M = None):
+    def Findparent(self,X_L, X_u, pri, case_control):
       # n_L,p,n_u,M,List_prob_xi_xj_1,List_count_xi_xj_1,List_prob_xi_xj_U,List_count_xi_xj_U,List_prob_xi_xj_0,K,pri = self.get_mutual_inf(X_L, X_u, pri)
-      n_L,p,n_U_or_UL,M,K,x_values = self.get_mutual_inf(X_L, X_u, pri,case_control)
+      n_L,p,n_U_or_UL,M,K,x_values = self.get_mutual_inf(X_L, X_u, pri, case_control)
       np.fill_diagonal(M,0)  
       V = range(p) # set of all nodes
       st = self.starting_node
@@ -339,8 +335,26 @@ class PTAN(Bayes_net_PU):
       return parent,n_L,p,n_U_or_UL,M,K,x_values
 
     
-    def fit(self,X_L, X_u, pri, case_control = True, M = None):  # this is based on trainning data !!!
-      parent,n_L,p,n_U_or_UL,M,K,x_values = self.Findparent(X_L, X_u, pri,case_control)
+    def fit(self,X_L, X_u, pri, M = None, case_control = True):  # this is based on trainning data !!!
+      """Implementation of fitting, part of training
+        Parameters
+        ----------
+        X_l : {array-like, sparse matrix}, shape (n_samples, n_features)
+            The training input positive labeled samples.
+        X_u : {array-like, sparse matrix}, shape (n_samples, n_features)
+            The training input unlabeled samples.
+        pri : scalar.
+            The prevalence probability (p(y = 1))
+        M : None
+          For consistency purpose, it will be ignored.
+        case_control : Bool
+            Case control scenario or single-training data scenario  
+        
+        Returns self
+        -------
+        self.
+      """
+      parent,n_L,p,n_U_or_UL,M,K,x_values = self.Findparent(X_L, X_u, pri, case_control)
       if case_control:
         X_U_or_UL = X_u
       else:
@@ -390,7 +404,7 @@ class PTAN(Bayes_net_PU):
         List_prob_0[i] = x_i_0_prob
       self.case_control_ = case_control
       self.is_fitted_ = True  
-      self.parent_ = parent
+      self.parent_, self.conditional_MI_ = parent, M
       self.n_features_, self.K_, self.List_count_1_,self.List_prob_1_, self.List_count_U_or_UL_, self.List_prob_0_, self.prevalence_ = p, K, List_count_1,List_prob_1,List_count_U_or_UL,List_prob_0, pri
       return self
       
@@ -415,7 +429,6 @@ class PTAN(Bayes_net_PU):
       #
       Prob_1 = np.array(Prob_1)
       return Prob_1
-
 
 
 
@@ -541,6 +554,7 @@ class PSTAN(Bayes_net_PU):
 
 
 
+
 class PESTAN(Bayes_net_PU):
   name = "PESTAN"
   def __init__(self,alpha = 1):
@@ -575,6 +589,8 @@ class PESTAN(Bayes_net_PU):
 
     Prob_1 = Prob_1/(self.n_features_)
     return(Prob_1)
+
+  
 
   
 
@@ -619,6 +635,7 @@ class PETAN(Bayes_net_PU):
     Prob_1 = Prob_1/(self.n_features_+ 1)
     return(Prob_1)
 
+
 # WNB and WTAN
 
 class WNB(Bayes_net_PU):
@@ -626,7 +643,7 @@ class WNB(Bayes_net_PU):
   def __init__(self,alpha = 1):
     self.alpha = alpha
 
-  def fit(self,X_L, X_u, pri, model_class = LogisticRegression, case_control = True, M = None, **kwargs):
+  def fit(self,X_L, X_u, pri, M = None, case_control = True, model_class = LogisticRegression,  **kwargs):
     """ Implementation of a fitting function.
         Get fitted model that predict p(s=1|x), not related to sampling scenario
         Parameters
@@ -637,12 +654,13 @@ class WNB(Bayes_net_PU):
             The training input unlabeled samples.
         pri : scalar
             The prevalence p(y=1)
+        M : None, should not be used.
+            contact matrix.
+        case_control : Bool
+            Case control scenario or single-training data scenario, only change c_hat
+            Other part are same in both scenario.
         model_class : a sklearn estimator, preferred logistic regression 
                       since it gives calibrated proba, predict p(s=1|x)
-        case_control : Bool
-            Case control scenario or single-training data scenario
-        M : None
-            contact matrix
         **kwargs : 
             extra parameters for model_class
 
@@ -655,8 +673,11 @@ class WNB(Bayes_net_PU):
     if X_L.shape[1] != X_u.shape[1]:
       raise ValueError('labeled data and unlabeled data have different number of features ')
     n_L,p = X_L.shape
+    # encode categorical features
     X = np.concatenate((X_L,X_u), axis = 0)
-    X = pd.DataFrame(X).astype('category') # convert to categorical, for logistic regression to work
+    enc = preprocessing.OneHotEncoder(drop='first').fit(X)
+    X = enc.transform(X).toarray()
+    # X = pd.DataFrame(X).astype('category') # convert to categorical, for logistic regression to work. Does not work in general, has to encode, but different proba
     y = np.concatenate( (np.repeat('1',X_L.shape[0] ), np.repeat('0',X_u.shape[0]) ),axis = 0)
     # fit model g(x) = p(s=1|x)
     model = model_class(**kwargs)
@@ -671,7 +692,7 @@ class WNB(Bayes_net_PU):
     # estimate w(x)
     # w_L = np.repeat(1,X_L.shape[0])
     inx = list(model.classes_ ).index('1')
-    g_U = model.predict_proba( pd.DataFrame(X_u).astype('category') )[:,inx] # let us assume it is already calibrated ,it that already calibrated? 
+    g_U = model.predict_proba( X[n_L:] )[:,inx] # let us assume it is already calibrated ,it that already calibrated? 
     w_U = ((1-c)/c) * (g_U/(1-g_U)) # maybe need to normalize
     w_U = w_U - min(w_U) # make non-negative
     w_U = w_U / max(w_U) # 0-1
@@ -688,9 +709,9 @@ class WNB(Bayes_net_PU):
       X_i_U_1_counter = {val: w_U[X_u[:,i] == val].sum() for val in x_i_values}
       X_i_U_0_counter = {val: (1-w_U)[X_u[:,i] == val].sum() for val in x_i_values} # w_U has to be <1
       # part 1, p(xi = j|1) = (N_L(xij) + sum_U_xij(w_U))/( n_L + sum(w_U))
-      List_prob_1[i] = {key: (x_i_L_counter[key] + X_i_U_1_counter[key])/ (n_L + w_U.sum() ) for key in x_i_values}
+      List_prob_1[i] = {key: (self.alpha + x_i_L_counter[key] + X_i_U_1_counter[key])/ (self.alpha*len(x_i_values)  + n_L + w_U.sum() ) for key in x_i_values}
       # part 2, p(xi = j|1)
-      List_prob_0[i] = {key: ( X_i_U_0_counter[key])/ ((1-w_U).sum() ) for key in x_i_values}
+      List_prob_0[i] = {key: (self.alpha + X_i_U_0_counter[key])/ ((1-w_U).sum() + self.alpha*len(x_i_values) ) for key in x_i_values}
     
     self.is_fitted_ = True
     self.case_control_ = case_control
@@ -757,7 +778,7 @@ class WTAN(Bayes_net_PU):
       
       return parent
   
-  def fit(self,X_L, X_u, pri, M, model_class = LogisticRegression, case_control = True, **kwargs):
+  def fit(self,X_L, X_u, pri, M,  case_control = True, model_class = LogisticRegression, **kwargs):
     """ Implementation of a fitting function.
         Get fitted model that predict p(s=1|x), not related to sampling scenario
         Parameters
@@ -768,12 +789,13 @@ class WTAN(Bayes_net_PU):
             The training input unlabeled samples.
         pri : scalar
             The prevalence p(y=1)
-        model_class : a sklearn estimator, preferred logistic regression 
-                      since it gives calibrated proba, predict p(s=1|x)
-        case_control : Bool
-            Case control scenario or single-training data scenario
         M : np.matrix, shpae (n_features, n_features)
             contact matrix
+        case_control : Bool
+            Case control scenario or single-training data scenario
+        model_class : a sklearn estimator, preferred logistic regression 
+                      since it gives calibrated proba, predict p(s=1|x)
+        
         **kwargs : 
             extra parameters for model_class
 
@@ -790,7 +812,9 @@ class WTAN(Bayes_net_PU):
     parent = self.Findparent(M)
     # fit model g(x) = p(s=1|x)
     X = np.concatenate((X_L,X_u), axis = 0)
-    X = pd.DataFrame(X).astype('category') # convert to categorical, for logistic regression to work
+    enc = preprocessing.OneHotEncoder(drop='first').fit(X)
+    X = enc.transform(X).toarray()
+    # X = pd.DataFrame(X).astype('category') # convert to categorical, for logistic regression to work
     y = np.concatenate( (np.repeat('1',X_L.shape[0] ), np.repeat('0',X_u.shape[0]) ),axis = 0)
     # 
     model = model_class(**kwargs)
@@ -804,7 +828,7 @@ class WTAN(Bayes_net_PU):
       c = p_s_1/pri
     # estimate w(x)
     inx = list(model.classes_ ).index('1')
-    g_U = model.predict_proba( pd.DataFrame(X_u).astype('category') )[:,inx] # let us assume it is already calibrated ,it that already calibrated? 
+    g_U = model.predict_proba( X[n_L:] )[:,inx] # let us assume it is already calibrated ,it that already calibrated? 
     w_U = ((1-c)/c) * (g_U/(1-g_U)) # maybe need to normalize
     w_U = w_U - min(w_U) # make non-negative
     w_U = w_U / max(w_U) # 0-1
@@ -821,20 +845,20 @@ class WTAN(Bayes_net_PU):
     X_i_U_1_counter = {val: w_U[X_u[:,root_i] == val].sum() for val in x_i_values}
     X_i_U_0_counter = {val: (1-w_U)[X_u[:,root_i] == val].sum() for val in x_i_values}
     # part 1, p(xi = j|1) = (N_L(xij) + sum_U_xij(w_U))/( n_L + sum(w_U))
-    List_prob_1[root_i] = {key: (x_i_L_counter[key] + X_i_U_1_counter[key])/ (n_L + w_U.sum() ) for key in x_i_values}
+    List_prob_1[root_i] = {key: (self.alpha + x_i_L_counter[key] + X_i_U_1_counter[key]) / (n_L + w_U.sum() + self.alpha*len(x_i_values) ) for key in x_i_values}
     # part 2, p(xi = j|1)
-    List_prob_0[root_i] = {key: ( X_i_U_0_counter[key])/ ((1-w_U).sum() ) for key in x_i_values}
+    List_prob_0[root_i] = {key: ( self.alpha + X_i_U_0_counter[key])/ ((1-w_U).sum() + self.alpha*len(x_i_values) ) for key in x_i_values}
     # for other nodes
     for i in [e for e in range(0,p) if e != root_i]:
       x_i_values = list(set(X_L[:,i]).union(X_u[:,i]))
       x_i_parent_Value = list(set(X_L[:,parent[i]]).union(X_u[:,parent[i] ] ) )
       # part 1, p(xij|1,xkl)
-      List_prob_1[i] = {v2: {v1: ( X_L[(X_L[:,i] == v1) & (X_L[:,parent[i]] == v2)].shape[0]  +  w_U[(X_u[:,i] == v1) & (X_u[:,parent[i]] == v2)].sum()   ) / 
-                             ( X_L[(X_L[:,parent[i]] == v2)].shape[0] +  w_U[(X_u[:,parent[i]] == v2)].sum()  ) 
+      List_prob_1[i] = {v2: {v1: (self.alpha + X_L[(X_L[:,i] == v1) & (X_L[:,parent[i]] == v2)].shape[0]  +  w_U[(X_u[:,i] == v1) & (X_u[:,parent[i]] == v2)].sum()   ) / 
+                             ( X_L[(X_L[:,parent[i]] == v2)].shape[0] +  w_U[(X_u[:,parent[i]] == v2)].sum()+ self.alpha*len(x_i_values)  ) 
                              for v1 in x_i_values} for v2 in x_i_parent_Value}
       # part 2 , p(xij|0,xkl)
-      List_prob_0[i] = {v2: {v1:  (1-w_U)[(X_u[:,i] == v1) & (X_u[:,parent[i]] == v2)].sum() / 
-                              (1-w_U)[(X_u[:,parent[i]] == v2)].sum()   
+      List_prob_0[i] = {v2: {v1: (self.alpha + (1-w_U)[(X_u[:,i] == v1) & (X_u[:,parent[i]] == v2)].sum()  ) / 
+                              ( (1-w_U)[(X_u[:,parent[i]] == v2)].sum() + self.alpha*len(x_i_values)  )
                              for v1 in x_i_values} for v2 in x_i_parent_Value}
     
     
